@@ -24,10 +24,10 @@ function horizontalMovement(r, x){
         horizontal = true;
     }
     if(r + x <= 600 && horizontal === true){
-        x += 4;
+        x += 9;
     }
     else if(r + x >= 0 && horizontal === false){
-        x -= 2;
+        x -= 6;
     }
     return x;
 }
@@ -39,10 +39,10 @@ function verticalMovement(r, y){
         vertical = true;
     }
     if(r + y <= 600 && vertical === true){
-        y += 2;
+        y += 6;
     }
     else if(r + y >= 0 && vertical === false){
-        y -= 3;
+        y -= 6;
     }
     return y;
 }
@@ -56,12 +56,12 @@ var c=document.getElementById("stage");
 var ctx=c.getContext("2d");
 
 
-setInterval(function() {
+window.requestAnimationFrame(function() {
     updatePosition(thetaB, thetaA)
-}, 10);
+})
 
 function updatePosition(valA, valB){
-    // ctx.clearRect(0, 0, 600, 600)
+     ctx.clearRect(0, 0, 600, 600)
     upTheta();
     z = horizontalMovement(50, z);
     t = verticalMovement(50, t);
@@ -87,4 +87,7 @@ function updatePosition(valA, valB){
     // if (val > Math.PI){
     //     clearInterval()
     // }
+    window.requestAnimationFrame(function() {
+        updatePosition(thetaB, thetaA)
+    })
 }
