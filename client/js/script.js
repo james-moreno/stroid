@@ -1,3 +1,13 @@
+class Circle {
+    constructor(r, x, y, vx, vy) {
+        this.r = r
+        this.x = x
+        this.y = y
+        this.vx = vx
+        this.vy = vy
+    }
+}
+
 function point(r, angle, center) {
     return {
         x: r*Math.cos(angle)+center.x,
@@ -16,78 +26,73 @@ function upTheta(){
         thetaB += (0.0174533*2);
     }
 }
-function horizontalMovement(r, x){
-    if(r + x >= 600){
+function horizontalMovement(circle){
+    if(circle.r + circle.x >= 600){
         horizontal = false;
     }
-    else if(-r + x <= 0){
+    else if(-circle.r + circle.x <= 0){
         horizontal = true;
     }
-    if(r + x <= 600 && horizontal === true){
-        x += 4;
+    if(circle.r + circle.x <= 600 && horizontal === true){
+        circle.x += circle.vx;
     }
-    else if(r + x >= 0 && horizontal === false){
-        x -= 2;
+    else if(circle.r + circle.x >= 0 && horizontal === false){
+        circle.x -= circle.vx;
     }
-    return x;
+    return circle.x;
 }
-function verticalMovement(r, y){
-    if(r + y >= 600){
+function verticalMovement(circle){
+    if(circle.r + circle.y >= 600){
         vertical = false;
     }
-    else if(-r + y <= 0){
+    else if(-circle.r + circle.y <= 0){
         vertical = true;
     }
-    if(r + y <= 600 && vertical === true){
-        y += 2;
+    if(circle.r + circle.y <= 600 && vertical === true){
+        circle.y += circle.vy;
     }
-    else if(r + y >= 0 && vertical === false){
-        y -= 3;
+    else if(circle.r + circle.y >= 0 && vertical === false){
+        circle.y -= circle.vy;
     }
-    return y;
+    return circle.y;
 }
+
+var circles = []
+
 var vertical = true;
 var horizontal = true;
-var z = 250;
-var t = 75;
+circles.push(new Circle(50, 100, 75, 6, 6))
+circles.push(new Circle(50, 250, 75, 2, 8))
 var thetaA = 0;
 var thetaB = 0;
 var c=document.getElementById("stage");
 var ctx=c.getContext("2d");
 
-function animation(){
-    updatePosition(thetaB, thetaA);
-}
-setInterval(function() {
+window.requestAnimationFrame(function() {
     updatePosition(thetaB, thetaA)
-}, 10);
+})
 
 function updatePosition(valA, valB){
     ctx.clearRect(0, 0, 600, 600)
     upTheta();
-    z = horizontalMovement(50, z);
-    t = verticalMovement(50, t);
 
-    var b = point(60, -valA, {x:100,y:75});
-    var p = point(60, valB, {x:z,y:t});
+    for (c in circles) {
+        //console.log(circles[c].x,circles[c].y,circles[c].r)
+        horizontalMovement(circles[c]);
+        verticalMovement(circles[c]);
 
-    ctx.beginPath();
-    ctx.arc(100,75,50,0,2*Math.PI);
-    ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(circles[c].x,circles[c].y,circles[c].r,0,2*Math.PI);
+        ctx.stroke();
 
-    ctx.beginPath();
-    ctx.arc(b.x,b.y,10,0,2*Math.PI);
-    ctx.stroke();
+        var b = point(circles[c].r+10, -valA, {x:circles[c].x,y:circles[c].y});
 
-    ctx.beginPath();
-    ctx.arc(z,t,50,0,2*Math.PI);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,10,0,2*Math.PI);
-    ctx.stroke();
-    // if (val > Math.PI){
-    //     clearInterval()
-    // }
-    requestanimationframe(updatePosition);
+        ctx.beginPath();
+        ctx.arc(b.x,b.y,10,0,2*Math.PI);
+        ctx.stroke();
+        //console.log(b)
+    }
+    window.requestAnimationFrame(function() {
+        updatePosition(thetaB, thetaA)
+    })
 }
