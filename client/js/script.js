@@ -55,13 +55,15 @@ var thetaB = 0;
 var c=document.getElementById("stage");
 var ctx=c.getContext("2d");
 
-
+function animation(){
+    updatePosition(thetaB, thetaA);
+}
 setInterval(function() {
     updatePosition(thetaB, thetaA)
 }, 10);
 
 function updatePosition(valA, valB){
-    // ctx.clearRect(0, 0, 600, 600)
+    ctx.clearRect(0, 0, 600, 600)
     upTheta();
     z = horizontalMovement(50, z);
     t = verticalMovement(50, t);
@@ -87,4 +89,5 @@ function updatePosition(valA, valB){
     // if (val > Math.PI){
     //     clearInterval()
     // }
+    requestanimationframe(updatePosition);
 }
