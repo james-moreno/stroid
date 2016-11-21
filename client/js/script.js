@@ -12,7 +12,7 @@ class Player {
     constructor(data){
         this.x = data.x;
         this.y = data.y;
-        this.hitbox = 5;
+        this.hitbox = 4;
         this.theta = data.theta;
     }
 
@@ -61,6 +61,15 @@ var circles = [];
 circles.push(new Circle(50, 250, 450, 4, 3));
 circles.push(new Circle(50, 250, 75, 3, 5));
 circles.push(new Circle(50, 300, 275, 3, 2));
+circles.push(new Circle(50, 450, 450, 4, 3));
+circles.push(new Circle(50, 200, 200, 3, 5));
+circles.push(new Circle(50, 60, 60, 3, 2));
+circles.push(new Circle(50, 601, 650, 4, 3));
+circles.push(new Circle(50, 501, 75, 3, 5));
+circles.push(new Circle(50, 100, 600, 3, 2));
+circles.push(new Circle(50, 150, 750, 4, 3));
+circles.push(new Circle(50, 501, 301, 3, 5));
+circles.push(new Circle(50, 651, 251, 3, 2));
 var thetaA = 0;
 var thetaB = 0;
 var c=document.getElementById("stage");
@@ -74,7 +83,7 @@ circles[0].players.push(new Player({theta:2}));
 
 window.requestAnimationFrame(function() {
     updatePosition(thetaB, thetaA);
-});
+}, 1000/ 5);
 
 function collision(circleA, circleB){
     var dx = circleA.x - circleB.x;
@@ -104,23 +113,32 @@ function collision(circleA, circleB){
         }
     }
 }
-
+var colors = ["blue", "green", "red", "yellow", "orange", "purple"]
+var count = 0;
 function updatePosition(valA, valB){
-    ctx.clearRect(0, 0, 2400, 2400);
-
+    // ctx.clearRect(0, 0, 800, 800);
+    count ++;
+    // document.getElementById("stage").style.background = colors[Math.floor(count/2)];
+    if (count > 24) {
+        count = 0;
+    }
     for (c in circles) {
         horizontalMovement(circles[c]);
         verticalMovement(circles[c]);
 
         ctx.beginPath();
         ctx.arc(circles[c].x,circles[c].y,circles[c].r,0,2*Math.PI);
+        ctx.fillStyle = colors[Math.floor(count/4)];
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'white';
         ctx.stroke();
 
         for (var p in circles[c].players) {
-            var pointOnOuterCircle = point(circles[c].r+10, circles[c].players[p].theta, {x:circles[c].x,y:circles[c].y});
+            var pointOnOuterCircle = point(circles[c].r+circles[c].players[p].hitbox, circles[c].players[p].theta, {x:circles[c].x,y:circles[c].y});
 
             ctx.beginPath();
-            ctx.arc(pointOnOuterCircle.x,pointOnOuterCircle.y,10,0,2*Math.PI);
+            ctx.arc(pointOnOuterCircle.x,pointOnOuterCircle.y,circles[c].players[p].hitbox,0,2*Math.PI);
             ctx.stroke();
 
             circles[c].players[p].updateTheta();
@@ -137,5 +155,5 @@ function updatePosition(valA, valB){
 
     window.requestAnimationFrame(function() {
         updatePosition(thetaB, thetaA);
-    });
+    }, 1000/ 5);
 }
