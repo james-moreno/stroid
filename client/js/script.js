@@ -3,17 +3,23 @@ class Circle {
         this.r = r;
         this.x = x;
         this.y = y;
-        this.vx = vx;
-        this.vy = vy;
-        this.players = []
+//        this.vx = vx;
+//        this.vy = vy;
+        this.vx = 0, this.vy = 0
+        this.players = [];
+        this.isSelected = false;
+        this.id = id++;
     }
 }
 class Player {
     constructor(data){
         this.x = data.x;
         this.y = data.y;
-        this.hitbox = 5;
+        this.r = 5;
         this.theta = data.theta;
+        this.isPlayer = true;
+        this.isSelected = false;
+        this.id = id++;
     }
 
     updateTheta(){
@@ -21,8 +27,8 @@ class Player {
             this.theta = 0;
         }
         else {
-            this.theta += 0.0174533;
-            //thetaB += (0.0174533*2);
+      //      this.theta += 0.0174533;
+            this.theta += 0;
         }
     }
 
@@ -57,12 +63,12 @@ function verticalMovement(circle){
 }
 
 var circles = [];
+var id = 0
 
 circles.push(new Circle(50, 250, 450, 4, 3));
 circles.push(new Circle(50, 250, 75, 3, 5));
 circles.push(new Circle(50, 300, 275, 3, 2));
-var thetaA = 0;
-var thetaB = 0;
+
 var c=document.getElementById("stage");
 var ctx=c.getContext("2d");
 
@@ -70,18 +76,14 @@ circles[0].players.push(new Player({theta:0}));
 circles[0].players.push(new Player({theta:1}));
 circles[0].players.push(new Player({theta:2}));
 
-// var player = new Circle(5, )
-
 window.requestAnimationFrame(function() {
-    updatePosition(thetaB, thetaA);
+    updatePosition();
 });
 
 function collision(circleA, circleB){
-    var dx = circleA.x - circleB.x;
-    var dy = circleA.y - circleB.y;
-    var distance = Math.sqrt(dx * dx + dy * dy);
     var tmp;
-    if (distance < circleA.r + circleB.r){
+
+    if (isCollision(circleA, circleB)){
         if((circleA.vy > 0 && circleB.vy < 0) || (circleA.vy < 0 && circleB.vy > 0)){
             tmp = circleA.vy;
             circleA.vy = circleB.vy;
@@ -105,26 +107,49 @@ function collision(circleA, circleB){
     }
 }
 
-function updatePosition(valA, valB){
+function updatePosition(){
     ctx.clearRect(0, 0, 2400, 2400);
 
     for (c in circles) {
         horizontalMovement(circles[c]);
         verticalMovement(circles[c]);
 
+        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+
+        if (circles[c].isSelected) {
+            ctx.fillStyle = 'green';
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#003300';
+        }
+
         ctx.beginPath();
+
         ctx.arc(circles[c].x,circles[c].y,circles[c].r,0,2*Math.PI);
         ctx.stroke();
+        ctx.fill();
+        ctx.closePath();
 
         for (var p in circles[c].players) {
             var pointOnOuterCircle = point(circles[c].r+10, circles[c].players[p].theta, {x:circles[c].x,y:circles[c].y});
+            circles[c].players[p].updatePosition(pointOnOuterCircle);
+
+            ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+
+            if (circles[c].players[p].isSelected) {
+                ctx.fillStyle = 'green';
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#003300';
+            }
 
             ctx.beginPath();
             ctx.arc(pointOnOuterCircle.x,pointOnOuterCircle.y,10,0,2*Math.PI);
             ctx.stroke();
+            ctx.fill();
+            ctx.closePath();
+        }
 
+        for (var p in circles[c].players) {
             circles[c].players[p].updateTheta();
-            circles[c].players[p].updatePosition(pointOnOuterCircle);
         }
     }
     for (var i = 0; i < circles.length-1; i++) {
@@ -136,6 +161,39 @@ function updatePosition(valA, valB){
     }
 
     window.requestAnimationFrame(function() {
-        updatePosition(thetaB, thetaA);
+        updatePosition();
     });
+}
+
+function selectCircle(event) {
+    var canvas = document.getElementById('stage').getBoundingClientRect()
+    var x = event.clientX - canvas.left
+    var y = event.clientY - canvas.top
+
+
+    for (c in circles) {
+        if (isCollision(circles[c], {x:x,y:y,r:0})) {
+            circles[c].isSelected = !circles[c].isSelected;
+        } else {
+            circles[c].isSelected = false;
+        }
+
+
+        for (var p in circles[c].players) {
+            if (isCollision(circles[c].players[p], {x:x,y:y,r:0})) {
+                circles[c].players[p].isSelected = !circles[c].players[p].isSelected;
+            } else {
+                circles[c].players[p].isSelected = false;
+            }
+        }
+    }
+
+}
+
+function isCollision(circleA, circleB) {
+    var dx = circleA.x - circleB.x;
+    var dy = circleA.y - circleB.y;
+
+    var distance = Math.sqrt(dx * dx + dy * dy);
+    return distance < circleA.r + circleB.r
 }
