@@ -3,9 +3,9 @@ class Circle {
         this.r = r;
         this.x = x;
         this.y = y;
-//        this.vx = vx;
-//        this.vy = vy;
-        this.vx = 0, this.vy = 0
+        this.vx = vx;
+        this.vy = vy;
+//        this.vx = 0, this.vy = 0
         this.players = [];
         this.isSelected = false;
         this.id = id++;
@@ -27,8 +27,7 @@ class Player {
             this.theta = 0;
         }
         else {
-      //      this.theta += 0.0174533;
-            this.theta += 0;
+            this.theta += 0.0174533;
         }
     }
 
@@ -73,6 +72,7 @@ var c=document.getElementById("stage");
 var ctx=c.getContext("2d");
 
 circles[0].players.push(new Player({theta:0}));
+circles[0].players[0].isSelected = true
 circles[0].players.push(new Player({theta:1}));
 circles[0].players.push(new Player({theta:2}));
 
@@ -196,4 +196,10 @@ function isCollision(circleA, circleB) {
 
     var distance = Math.sqrt(dx * dx + dy * dy);
     return distance < circleA.r + circleB.r
+}
+
+window.onkeydown = function(event) {
+    if (event.keyCode == 32 && event.target == document.body) {
+        event.preventDefault();
+    }
 }
