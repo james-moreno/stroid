@@ -18,7 +18,7 @@ class Player {
         this.r = 10;
         this.theta = data.theta;
         this.isPlayer = true;
-        this.isSelected = false;
+        this.isSelected = true;
         this.id = id++;
     }
 
@@ -92,7 +92,6 @@ function collision(circleA, circleB){
         
         player.theta = Math.atan2((player.y-planet.y),(player.x-planet.x));
         planet.players.push(circles.splice(circles.indexOf(player), 1)[0])
-
     } else if (colliding){
         if((circleA.vy > 0 && circleB.vy < 0) || (circleA.vy < 0 && circleB.vy > 0)){
             tmp = circleA.vy;
@@ -164,9 +163,7 @@ function updatePosition(){
     }
     for (var i = 0; i < circles.length-1; i++) {
         for (var j = i+1; j < circles.length; j++) {
-            if (i !== j) {
-                collision(circles[i], circles[j]);
-            }
+            collision(circles[i], circles[j]);
         }
     }
 
@@ -214,12 +211,14 @@ window.onkeydown = function(event) {
         console.log('space bar hit');
 
         for (var c in circles) {
-            for (var p in circles[c].players) {
+            var p = 0;
+            while (circles[c].players && p < circles[c].players.length) {
                 if (circles[c].players[p].isSelected) {
                     circles[c].players[p].vy = 10*Math.sin(circles[c].players[p].theta);
                     circles[c].players[p].vx = 10*Math.cos(circles[c].players[p].theta);
                     circles.push(circles[c].players.splice(p,1)[0])
-                    break;
+                } else {
+                    p++;
                 }
             }
         }
