@@ -1,3 +1,11 @@
+var socket = io()
+
+socket.on('news', function (data) {
+    console.log(data);
+    socket.emit('my other event', { my: 'data' });
+});
+
+
 class Circle {
     constructor(r, x, y, vx, vy) {
         this.r = r;
@@ -45,38 +53,51 @@ function point(r, angle, center) {
 }
 
 function horizontalMovement(circle){
-    if(circle.r + circle.x >= window.innerWidth || -circle.r + circle.x <= 0){
+    if(circle.r + circle.x >= window.innerWidth*3 || -circle.r + circle.x <= 0){
         circle.vx = -circle.vx;
     }
-    if(circle.r + circle.x <= window.innerWidth || circle.r + circle.x >= 0){
+    if(circle.r + circle.x <= window.innerWidth*3 || circle.r + circle.x >= 0){
         circle.x += circle.vx;
     }
 }
 function verticalMovement(circle){
-    if(circle.r + circle.y >= window.innerHeight || -circle.r + circle.y <= 0){
+    if(circle.r + circle.y >= window.innerHeight*3 || -circle.r + circle.y <= 0){
         circle.vy = -circle.vy;
     }
-    if(circle.r + circle.y <= window.innerHeight || circle.r + circle.y >= 0){
+    if(circle.r + circle.y <= window.innerHeight*3 || circle.r + circle.y >= 0){
         circle.y += circle.vy;
     }
+}
+
+function randomInt(upperBound) {
+    return Math.floor(Math.random()*upperBound)+1
 }
 
 var circles = [];
 var id = 0
 
-circles.push(new Circle(50, 250, 450, 5, 5));
-circles.push(new Circle(50, 250, 75, 5, 5));
-circles.push(new Circle(50, 300, 275, 5, 5));
+for (var i = 0; i < 35; i++) {
+//    for (var j = 0; j < 10; j++) {
+    for (var j = 0; j < 2; j++) {
+        circles.push(new Circle(50, i*75+55+(j*500), i*75+55, randomInt(6), randomInt(6)))
+    }
 
+}
 var c=document.getElementById("stage");
-c.width = window.innerWidth;
-c.height = window.innerHeight;
+c.width = window.innerWidth*3;
+c.height = window.innerHeight*3;
 var ctx=c.getContext("2d");
 
-circles[0].players.push(new Player({theta:0}));
-circles[0].players[0].isSelected = true
-circles[0].players.push(new Player({theta:1}));
-circles[0].players.push(new Player({theta:2}));
+
+for (var i in circles) {
+    circles[i].players.push(new Player({theta:0}));
+    circles[i].players.push(new Player({theta:1}));
+    circles[i].players.push(new Player({theta:2}));
+    circles[i].players.push(new Player({theta:3}));
+    circles[i].players.push(new Player({theta:4}));
+    circles[i].players.push(new Player({theta:5}));
+    circles[i].players.push(new Player({theta:6}));
+}
 
 window.requestAnimationFrame(function() {
     updatePosition();
@@ -86,7 +107,7 @@ function collision(circleA, circleB){
     var tmp;
     var colliding = isCollision(circleA, circleB);
 
-    if (colliding && (circleA.isPlayer || circleB.isPlayer)) {
+    if (colliding && (circleA.isPlayer || circleB.isPlayer) && !(circleA.isPlayer && circleB.isPlayer)) {
         var player = circleA.isPlayer ? circleA : circleB;
         var planet = !circleA.isPlayer ? circleA : circleB;
         
@@ -117,7 +138,7 @@ function collision(circleA, circleB){
 }
 
 function updatePosition(){
-    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    ctx.clearRect(0, 0, window.innerWidth*3, window.innerHeight*3);
 
     for (c in circles) {
         horizontalMovement(circles[c]);
@@ -209,6 +230,8 @@ window.onkeydown = function(event) {
     if (event.keyCode == 32 && event.target == document.body) {
         event.preventDefault();
         console.log('space bar hit');
+    //    socket.emit('launch', { socket:socket, young:"iggin" });
+    socket.emit('launch', { "socket":socket.id });
 
         for (var c in circles) {
             var p = 0;

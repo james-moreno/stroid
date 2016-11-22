@@ -5,7 +5,7 @@ var browserSync = require('browser-sync').create()
 
 gulp.task('browser-sync', ['nodemon'], function() {
     return browserSync.init({
-        proxy: 'localhost:8000',
+        proxy: 'localhost:8080',
         ws: true,
         port: 5000,
         open: false,
