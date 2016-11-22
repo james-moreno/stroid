@@ -1,5 +1,5 @@
 class Circle {
-    constructor(r, x, y, vx, vy, up, right) {
+    constructor(r, x, y, vx, vy) {
         this.r = r;
         this.x = x;
         this.y = y;
@@ -64,9 +64,9 @@ function verticalMovement(circle){
 var circles = [];
 var id = 0
 
-circles.push(new Circle(50, 250, 450, 4, 3));
-circles.push(new Circle(50, 250, 75, 3, 5));
-circles.push(new Circle(50, 300, 275, 3, 2));
+circles.push(new Circle(50, 250, 450, 5, 5));
+circles.push(new Circle(50, 250, 75, 5, 5));
+circles.push(new Circle(50, 300, 275, 5, 5));
 
 var c=document.getElementById("stage");
 c.width = window.innerWidth;
@@ -216,8 +216,8 @@ window.onkeydown = function(event) {
         for (var c in circles) {
             for (var p in circles[c].players) {
                 if (circles[c].players[p].isSelected) {
-                    circles[c].players[p].vy = -circles[c].vy;
-                    circles[c].players[p].vx = -circles[c].vx;
+                    circles[c].players[p].vy = 10*Math.sin(circles[c].players[p].theta);
+                    circles[c].players[p].vx = 10*Math.cos(circles[c].players[p].theta);
                     circles.push(circles[c].players.splice(p,1)[0])
                     break;
                 }
