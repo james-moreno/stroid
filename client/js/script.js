@@ -15,7 +15,7 @@ class Player {
     constructor(data){
         this.x = data.x;
         this.y = data.y;
-        this.r = 5;
+        this.r = 10;
         this.theta = data.theta;
         this.isPlayer = true;
         this.isSelected = false;
@@ -45,18 +45,18 @@ function point(r, angle, center) {
 }
 
 function horizontalMovement(circle){
-    if(circle.r + circle.x >= 800 || -circle.r + circle.x <= 0){
+    if(circle.r + circle.x >= window.innerWidth || -circle.r + circle.x <= 0){
         circle.vx = -circle.vx;
     }
-    if(circle.r + circle.x <= 800 || circle.r + circle.x >= 0){
+    if(circle.r + circle.x <= window.innerWidth || circle.r + circle.x >= 0){
         circle.x += circle.vx;
     }
 }
 function verticalMovement(circle){
-    if(circle.r + circle.y >= 800 || -circle.r + circle.y <= 0){
+    if(circle.r + circle.y >= window.innerHeight || -circle.r + circle.y <= 0){
         circle.vy = -circle.vy;
     }
-    if(circle.r + circle.y <= 800 || circle.r + circle.y >= 0){
+    if(circle.r + circle.y <= window.innerHeight || circle.r + circle.y >= 0){
         circle.y += circle.vy;
     }
 }
@@ -69,6 +69,8 @@ circles.push(new Circle(50, 250, 75, 3, 5));
 circles.push(new Circle(50, 300, 275, 3, 2));
 
 var c=document.getElementById("stage");
+c.width = window.innerWidth;
+c.height = window.innerHeight;
 var ctx=c.getContext("2d");
 
 circles[0].players.push(new Player({theta:0}));
@@ -82,8 +84,16 @@ window.requestAnimationFrame(function() {
 
 function collision(circleA, circleB){
     var tmp;
+    var colliding = isCollision(circleA, circleB);
 
-    if (isCollision(circleA, circleB)){
+    if (colliding && (circleA.isPlayer || circleB.isPlayer)) {
+        var player = circleA.isPlayer ? circleA : circleB;
+        var planet = !circleA.isPlayer ? circleA : circleB;
+        
+        player.theta = Math.atan2((player.y-planet.y),(player.x-planet.x));
+        planet.players.push(circles.splice(circles.indexOf(player), 1)[0])
+
+    } else if (colliding){
         if((circleA.vy > 0 && circleB.vy < 0) || (circleA.vy < 0 && circleB.vy > 0)){
             tmp = circleA.vy;
             circleA.vy = circleB.vy;
@@ -108,7 +118,7 @@ function collision(circleA, circleB){
 }
 
 function updatePosition(){
-    ctx.clearRect(0, 0, 2400, 2400);
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
     for (c in circles) {
         horizontalMovement(circles[c]);
@@ -201,5 +211,18 @@ function isCollision(circleA, circleB) {
 window.onkeydown = function(event) {
     if (event.keyCode == 32 && event.target == document.body) {
         event.preventDefault();
+        console.log('space bar hit');
+
+        for (var c in circles) {
+            for (var p in circles[c].players) {
+                if (circles[c].players[p].isSelected) {
+                    circles[c].players[p].vy = -circles[c].vy;
+                    circles[c].players[p].vx = -circles[c].vx;
+                    circles.push(circles[c].players.splice(p,1)[0])
+                    break;
+                }
+            }
+        }
     }
 }
+
