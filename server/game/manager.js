@@ -7,7 +7,6 @@
             this.width = width;
             this.height = height;
             this.context = null;
-            //			this.canvas = null;
             this.isClient = false;
 
             for (var i in this.circles) {
@@ -27,10 +26,25 @@
             }
             */
         }
+        generateBackground(source){
+            if (!this.image) {
+                this.image = new Image();
+                this.image.src = source;
+
+                this.image.onload = function() {
+                    this.image.height = this.context.canvas.height;
+                    this.image.width = this.context.canvas.width;
+
+                    this.context.drawImage(this.image, 0, 0, this.context.canvas.width, this.context.canvas.height, 0, 0, this.context.canvas.width, this.context.canvas.height);
+                    this.image.isLoaded = true;
+                }.bind(this);
+            } else if (this.image.isLoaded) {
+                this.context.drawImage(this.image, 0, 0, this.context.canvas.width, this.context.canvas.height, 0, 0, this.context.canvas.width, this.context.canvas.height);
+            }
+        }
 
         updatePositions(callback) {
             if (this.isClient) {
-                this.clearCanvas();
             }
 
             for (var c in this.circles) {
@@ -61,6 +75,7 @@
 
             if (callback) {
                 callback(function() {
+                    this.generateBackground()
                     this.updatePositions(callback);
                 }.bind(this));
             }

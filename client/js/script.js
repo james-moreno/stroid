@@ -33,7 +33,9 @@ httpGetAsync('/stage', function(data) {
     stage.context = cvs.getContext("2d");
     stage.isClient = true;
 
+    stage.generateBackground("img/galaxy.jpg")
     window.requestAnimationFrame(function() {
+        stage.generateBackground()
         stage.updatePositions(window.requestAnimationFrame);
     });
 });
@@ -69,27 +71,27 @@ window.onkeydown = function(event) {
 }
 */
 
-function selectCircle(event) {
-    var canvas = document.getElementById('stage').getBoundingClientRect()
-    var x = event.clientX - canvas.left
-    var y = event.clientY - canvas.top
-
-
-    for (c in stage.circles) {
-        if (stage.isCollision(stage.circles[c], {x:x,y:y,r:0})) {
-            stage.circles[c].isSelected = !stage.circles[c].isSelected;
-        } else {
-            stage.circles[c].isSelected = false;
-        }
-
-
-        for (var p in stage.circles[c].players) {
-            if (stage.isCollision(stage.circles[c].players[p], {x:x,y:y,r:0})) {
-                stage.circles[c].players[p].isSelected = !stage.circles[c].players[p].isSelected;
-            } else {
-                stage.circles[c].players[p].isSelected = false;
-            }
-        }
-    }
-
-}
+// function selectCircle(event) {
+//     var canvas = document.getElementById('stage').getBoundingClientRect()
+//     var x = event.clientX - canvas.left
+//     var y = event.clientY - canvas.top
+//
+//
+//     for (c in stage.circles) {
+//         if (stage.isCollision(stage.circles[c], {x:x,y:y,r:0})) {
+//             stage.circles[c].isSelected = !stage.circles[c].isSelected;
+//         } else {
+//             stage.circles[c].isSelected = false;
+//         }
+//
+//
+//         for (var p in stage.circles[c].players) {
+//             if (stage.isCollision(stage.circles[c].players[p], {x:x,y:y,r:0})) {
+//                 stage.circles[c].players[p].isSelected = !stage.circles[c].players[p].isSelected;
+//             } else {
+//                 stage.circles[c].players[p].isSelected = false;
+//             }
+//         }
+//     }
+//
+// }
