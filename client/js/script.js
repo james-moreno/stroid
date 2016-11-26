@@ -28,14 +28,22 @@ httpGetAsync('/stage', function(data) {
     }
 
     cvs = document.getElementById("stage");
-    cvs.width = stage.width;
-    cvs.height = stage.height;
+
+    stage.vwidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+    stage.vheight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+
+    cvs.width = stage.vwidth; 
+    cvs.height = stage.vheight;
+
     stage.context = cvs.getContext("2d");
     stage.isClient = true;
 
-    stage.generateBackground("img/galaxy.jpg")
+    var me = stage.circles[0].players[0]
+    me.isSelected = true;
+    stage.setCameraOn(me);
+
     window.requestAnimationFrame(function() {
-        stage.generateBackground()
+        stage.generateBackground("img/galaxy.jpg")
         stage.updatePositions(window.requestAnimationFrame);
     });
 });

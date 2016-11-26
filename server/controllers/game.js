@@ -1,7 +1,7 @@
 (function() {
     var manager = require('../game/manager.js');
 
-    var stage = new manager.Stage(2000,1000);
+    var stage = new manager.Stage(5000,5000);
 
     setInterval(stage.updatePositions.bind(stage), 1000/60)
 

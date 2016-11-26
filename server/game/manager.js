@@ -2,12 +2,17 @@
     var id = 0;
 
     class Stage {
-        constructor(width, height) {
+        constructor(width, height, vwidth, vheight) {
             this.circles = [new Circle(50, 100, 100, 5, 5)];
             this.width = width;
             this.height = height;
+            this.vwidth = vwidth;
+            this.vheight = vheight;
             this.context = null;
             this.isClient = false;
+            this.selection = null;
+
+            this.camera = {};
 
             for (var i in this.circles) {
                 this.circles[i].players.push(new Player(undefined, undefined, undefined, 0));
@@ -27,24 +32,50 @@
             */
         }
         generateBackground(source){
+            var drawImage = function() {
+                this.context.drawImage(this.image, this.camera.x, this.camera.y, this.vwidth, this.vheight, 0, 0, this.vwidth, this.vheight);
+            }.bind(this);
+
             if (!this.image) {
                 this.image = new Image();
                 this.image.src = source;
 
                 this.image.onload = function() {
-                    this.image.height = this.context.canvas.height;
-                    this.image.width = this.context.canvas.width;
-
-                    this.context.drawImage(this.image, 0, 0, this.context.canvas.width, this.context.canvas.height, 0, 0, this.context.canvas.width, this.context.canvas.height);
+                    this.image.height = this.height;
+                    this.image.width = this.width;
+                    console.log(this.height,this.width,this.image)
+                    drawImage()
                     this.image.isLoaded = true;
                 }.bind(this);
             } else if (this.image.isLoaded) {
-                this.context.drawImage(this.image, 0, 0, this.context.canvas.width, this.context.canvas.height, 0, 0, this.context.canvas.width, this.context.canvas.height);
+                drawImage()
             }
+
+        }
+
+        setCameraOn(circle) {
+            this.selected = circle;
+            var x,y
+            
+            x = circle.x-this.vwidth/2;
+            x = x < 0 ? 0 : x;
+            x = x+this.vwidth > this.width ? this.width-this.vwidth : x;
+            
+            y = circle.y-this.vheight/2;
+            y = y < 0 ? 0 : y;
+            y = y+this.vheight > this.height ? this.height-this.vheight : y;
+
+            this.camera.x = x;
+            this.camera.y = y; 
+        }
+
+        updateCamera() {
+            this.setCameraOn(this.selected);
         }
 
         updatePositions(callback) {
             if (this.isClient) {
+//                this.clearCanvas()
             }
 
             for (var c in this.circles) {
@@ -73,9 +104,13 @@
                 }
             }
 
+            if (this.isClient) {
+                this.updateCamera();
+            }
+
             if (callback) {
                 callback(function() {
-                    this.generateBackground()
+                    this.generateBackground();
                     this.updatePositions(callback);
                 }.bind(this));
             }
@@ -152,15 +187,16 @@
         draw(circle) {
             this.context.fillStyle = 'rgba(255, 255, 255, 0.5)';
 
+            this.context.beginPath();
+
             if (circle.isSelected) {
                 this.context.fillStyle = 'green';
                 this.context.lineWidth = 2;
                 this.context.strokeStyle = '#003300';
             }
 
-            this.context.beginPath();
+            this.context.arc(circle.x-this.camera.x, circle.y-this.camera.y, circle.r, 0, 2*Math.PI);//TODO:filter out objects or partially draw objects if not within viewport
 
-            this.context.arc(circle.x, circle.y, circle.r, 0, 2*Math.PI);
             this.context.stroke()
             this.context.fill()
             this.context.closePath()
