@@ -1,5 +1,6 @@
-var socket = io()
-var stage
+var socket = io();
+var stage;
+var frames = [];
 
 function httpGetAsync(url, callback) {
     var xmlHttp = new XMLHttpRequest();
@@ -20,32 +21,32 @@ httpGetAsync('/stage', function(data) {
 
     stage = objToClass('Stage', stage);
 
-    for (var c in stage.circles) {
-        stage.circles[c] = objToClass('Circle', stage.circles[c]);
-        for (var p in stage.circles[c].players) {
-            stage.circles[c].players[p] = objToClass('Player', stage.circles[c].players[p]);
-        }
-    }
-
     cvs = document.getElementById("stage");
 
-    stage.vwidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-    stage.vheight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
-    cvs.width = stage.vwidth; 
-    cvs.height = stage.vheight;
 
     stage.context = cvs.getContext("2d");
-    stage.isClient = true;
+    stage.generateBackground("img/galaxy.jpg")
 
-    var me = stage.circles[0].players[0]
-    me.isSelected = true;
-    stage.setCameraOn(me);
+    function step(timestamp) {
+        console.log(stage.circles)
 
-    window.requestAnimationFrame(function() {
+        stage.vwidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+        stage.vheight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+        cvs.width = stage.vwidth; 
+        cvs.height = stage.vheight;
+
+        stage.setCameraOn(stage.circles[0].players[0]);
         stage.generateBackground("img/galaxy.jpg")
-        stage.updatePositions(window.requestAnimationFrame);
-    });
+        if (frames.length > 0) {
+            stage.circles = frames.shift();
+        }
+
+        stage.drawUpdatedPositions(step);
+    }
+
+    window.requestAnimationFrame(step);
+
 });
 
 function objToClass(className, ObjectInstance) {
@@ -56,6 +57,11 @@ function objToClass(className, ObjectInstance) {
 
     return obj;
 }
+
+socket.on('updated_positions', function(data) {
+    console.log(data,'returneddde',data.stage.circles[0]);
+    frames.push(data.stage.circles);
+});
 
 /*
 window.onkeydown = function(event) {

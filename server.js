@@ -12,10 +12,10 @@
     app.use(express.static(path.join(__dirname, './server')));
 
 //        require('./server/config/mongoose.js')
-        require('./server/config/routes.js')(app)
-        require('./server/sockets/sockets.js')(server)
+    require('./server/sockets/sockets.js')(server)
+    require('./server/config/routes.js')(app)
 
-        server.listen(port, function() {
-            console.log('Node server on port',port);
-        });
-    })()
+    server.listen(port, function() {
+        console.log('Node server on port',port);
+    });
+})()

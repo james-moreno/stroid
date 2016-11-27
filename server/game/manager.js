@@ -43,12 +43,12 @@
                 this.image.onload = function() {
                     this.image.height = this.height;
                     this.image.width = this.width;
-                    console.log(this.height,this.width,this.image)
-                    drawImage()
+                    console.log(this.height,this.width,this.image);
+                    drawImage();
                     this.image.isLoaded = true;
                 }.bind(this);
             } else if (this.image.isLoaded) {
-                drawImage()
+                drawImage();
             }
 
         }
@@ -73,28 +73,15 @@
             this.setCameraOn(this.selected);
         }
 
-        updatePositions(callback) {
-            if (this.isClient) {
-//                this.clearCanvas()
-            }
-
+        updatePositions() {
             for (var c in this.circles) {
                 this.horizontalMovement(this.circles[c]);
                 this.verticalMovement(this.circles[c]);
-
-                if (this.isClient) {
-                    this.draw(this.circles[c]);
-                }
 
                 for (var p in this.circles[c].players) {
                     var pointOnOuterCircle = this.pointOnCircle(this.circles[c].r+10, this.circles[c].players[p].theta, {x:this.circles[c].x, y:this.circles[c].y});
                     this.circles[c].players[p].updatePosition(pointOnOuterCircle);
                     this.circles[c].players[p].updateTheta();
-
-                    if (this.isClient) {
-                        this.draw(this.circles[c].players[p]);
-                    }
-
                 }
             }
 
@@ -103,17 +90,17 @@
                     this.collision(this.circles[i], this.circles[j]);
                 }
             }
-
-            if (this.isClient) {
-                this.updateCamera();
+        }
+       
+        drawUpdatedPositions(callback) {
+            for (var c in this.circles) {
+                this.draw(this.circles[c]);
+                for (var p in this.circles[c].players) {
+                    this.draw(this.circles[c].players[p]);
+                }
             }
 
-            if (callback) {
-                callback(function() {
-                    this.generateBackground();
-                    this.updatePositions(callback);
-                }.bind(this));
-            }
+            window.requestAnimationFrame(callback);
         }
 
 
